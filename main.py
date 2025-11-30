@@ -1,6 +1,9 @@
 import platform
+if platform.platform().lower() == 'windows':
+    import ctypes
 import re
 from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtCore import Qt
 from ui import Ui_MainWindow
 import base64
 import os, sys
@@ -41,6 +44,7 @@ def valid_filename(filename: str):
 
 def log(string: str):
     print(str(time.time())+'\n'+string)
+
 # Key String to QR Code
 def to_qrcode(string: str) -> qrcode.QRCode:
     ''' Convert a string to a QR code
@@ -78,7 +82,6 @@ def wait_for_copy(timeout=0, latency: float = 0.5):
             return
         last = pyperclip.paste()
         time.sleep(latency)
-
 
 # Keys
 def refresh_keys():
@@ -125,8 +128,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton_5.clicked.connect(self.new_key)
         self.comboBox.currentTextChanged.connect(self.update_public_key)
-        self.pushButton_2.clicked.connect(self.encrypt)
-        self.pushButton_3.clicked.connect(self.decrypt)
+        self.pushButton_6.clicked.connect(self.encrypt)
+        self.pushButton_7.clicked.connect(self.decrypt)
+        self.pushButton_8.clicked.connect(self.copy_public_key)
     
     def update_public_key(self, keyname):
         key = self.private_keys[keyname]
@@ -162,19 +166,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # public_key = PublicKey(public_key)
         cipherbytes = public_key.encrypt(text)
         base64text = base64.b64encode(cipherbytes).decode('utf-8')
-        self.lineEdit_2.setText(base64text)
+        pyperclip.copy(base64text)
 
     def decrypt(self):
         keyname = self.comboBox.currentText()
         private_key = self.private_keys[keyname]
-        base64text = self.lineEdit_2.text()
+        base64text = pyperclip.paste()
         cipherbytes = base64.b64decode(base64text)
         text = private_key.decrypt(cipherbytes)
         self.lineEdit.setText(text)
+    
+    def copy_public_key(self):
+        public_keyname = self.comboBox_2.currentText()
+        public_key = self.public_keys[public_keyname].export_key().decode("utf-8")
+        print(public_key)
+        pyperclip.copy(public_key)
 
-# Generate UI: pyside6-uic -o ui.py main.ui                                                              
+# Generate UI: pyside6-uic -o ui.py main.ui
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MainWindow()
+    win.setWindowFlags(Qt.WindowStaysOnTopHint)
     win.show()
     sys.exit(app.exec())
