@@ -4,7 +4,7 @@ from Crypto.Random import get_random_bytes
 
 
 class Key:
-    def __init__(self, key_length=2048, key=None):
+    def __init__(self, key=None, key_length=2048):
         if key:
             self.key = RSA.import_key(key)
         else:
