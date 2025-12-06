@@ -165,6 +165,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_5.clicked.connect(self.new_key)
         self.comboBox.currentTextChanged.connect(self.update_public_key)
         self.pushButton_6.clicked.connect(self.encrypt)
+        self.poshButton_4.clicked.connect(self.setup_keys)
         self.pushButton_7.clicked.connect(self.decrypt)
         self.pushButton_8.clicked.connect(self.copy_public_key)
         self.pushButton.clicked.connect(self.open_private_key)
